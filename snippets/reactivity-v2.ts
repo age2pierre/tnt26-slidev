@@ -31,5 +31,11 @@ export function createEffect(fn: Effect) {
 }
 
 export function createComputed<T>(fn: () => T): () => T {
-  return fn
+  const [read, write] = createSignal(fn())
+
+  createEffect(() => {
+    write(fn())
+  })
+
+  return read
 }

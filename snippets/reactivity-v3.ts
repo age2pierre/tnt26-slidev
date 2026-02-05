@@ -10,6 +10,7 @@ export function createSignal<T>(value: T): Signal<T> {
     return value
   }
   const write = (nextVal: T) => {
+    if (value === nextVal) return
     value = nextVal
     subscribers.forEach((sub) => sub())
   }
@@ -31,5 +32,11 @@ export function createEffect(fn: Effect) {
 }
 
 export function createComputed<T>(fn: () => T): () => T {
-  return fn
+  const [read, write] = createSignal(fn())
+
+  createEffect(() => {
+    write(fn())
+  })
+
+  return read
 }
